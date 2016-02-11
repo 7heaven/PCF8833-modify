@@ -3,19 +3,18 @@
 // use. Enjoy!
 
 #include "PCF8833.h"
-#include "Image.h"
+// #include <wiring_digital.c>
 
 extern "C" {
-#include <wiring.h> 
-#include <inttypes.h>
-#include <avr/pgmspace.h>
+    // #include <wiring_private.h>
+// #include <inttypes.h>
+// #include <avr/pgmspace.h>
 }
 
-PCF8833::PCF8833(int8_t CS, int8_t SCLK, int8_t SDIN, int8_t RST) {
+PCF8833::PCF8833(int8_t CS, int8_t SCLK, int8_t SDIN) {
     cs = CS;
 	sclk = SCLK;
 	sdin = SDIN;
-    rst = RST;
 }
 
 void PCF8833::LCDClear(int color)	// Clear the whole screen with the specified colour
@@ -41,15 +40,15 @@ void PCF8833::LCDClear(int color)	// Clear the whole screen with the specified c
 void PCF8833::LCDInit()	// Initialise the screen
 {
 
-    pinMode(cs, OUTPUT);
-	pinMode(sclk, OUTPUT);
-	pinMode(sdin, OUTOUT);
+    pinMode(cs, 0x1);
+	pinMode(sclk, 0x1);
+	pinMode(sdin, 0x1);
 	
     csport      = portOutputRegister(digitalPinToPort(cs));
     cspinmask   = digitalPinToBitMask(cs);
 	sclkport    = portOutputRegister(digitalPinToPort(sclk));
 	sclkpinmask = digitalPinToBitMask(sclk);
-	sdinport    = portOutputRegister(digitalPinToPortA(sdin));
+	sdinport    = portOutputRegister(digitalPinToPort(sdin));
 	sdinpinmask = digitalPinToBitMask(sdin);
 	
     LCDCommand(0x11);   //Sleep_OUT
@@ -165,70 +164,70 @@ void PCF8833::DrawCircle(int colour, uint8_t x0, uint8_t y0, uint8_t radius)  //
 }
 
 
-void  PCF8833::DrawWuLine(int colour, uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) { // Wu's Anti-alias Line Algorithm
-    int Dx = x1 - x0; 
-    int Dy = y1 - y0;
-    int steep = (abs(Dy) >= abs(Dx));
-    if (steep) {
+// void  PCF8833::DrawWuLine(int colour, uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) { // Wu's Anti-alias Line Algorithm
+//     int Dx = x1 - x0; 
+//     int Dy = y1 - y0;
+//     int steep = (abs(Dy) >= abs(Dx));
+//     if (steep) {
 
-        /*
-		int a = x0;
-        int b = y0;
-        x0=b;
-        y0=a;
+//         /*
+// 		int a = x0;
+//         int b = y0;
+//         x0=b;
+//         y0=a;
 
-        a = x1;
-        b = y1;
-        x1=b;
-        y1=a;
-		*/
+//         a = x1;
+//         b = y1;
+//         x1=b;
+//         y1=a;
+// 		*/
 		
-		x0 ^= x1;
-		x1 ^= x0;
-		x0 ^= x1;
+// 		x0 ^= x1;
+// 		x1 ^= x0;
+// 		x0 ^= x1;
 		
-		y0 ^= y1;
-		y1 ^= y0;
-		y0 ^= y1;
+// 		y0 ^= y1;
+// 		y1 ^= y0;
+// 		y0 ^= y1;
 
-        // recompute Dx, Dy after swap
-        Dx = x1 - x0;
-        Dy = y1 - y0;
-    }
-    int xstep = 1;
-    if (Dx < 0) {
-        xstep = -1;
-        Dx = -Dx;
-    }
-    int ystep = 1;
-    if (Dy < 0) {
-        ystep = -1;		
-        Dy = -Dy; 
-    }
-    int TwoDy = 2*Dy; 
-    int TwoDyTwoDx = TwoDy - 2*Dx; // 2*Dy - 2*Dx
-    int E = TwoDy - Dx; //2*Dy - Dx
-    int y = y0;
-    int xDraw, yDraw;	
-    for (int x = x0; x != x1; x += xstep) {		
-        if (steep) {			
-            xDraw = y;
-            yDraw = x;
-        } else {			
-           xDraw = x;
-           yDraw = y;
-        }
-        // plot
-        DrawPixel(colour,xDraw, yDraw);
-        // next
-        if (E > 0) {
-            E += TwoDyTwoDx; //E += 2*Dy - 2*Dx;
-            y = y + ystep;
-        } else {
-            E += TwoDy; //E += 2*Dy;
-        }
-    }
-}
+//         // recompute Dx, Dy after swap
+//         Dx = x1 - x0;
+//         Dy = y1 - y0;
+//     }
+//     int xstep = 1;
+//     if (Dx < 0) {
+//         xstep = -1;
+//         Dx = -Dx;
+//     }
+//     int ystep = 1;
+//     if (Dy < 0) {
+//         ystep = -1;		
+//         Dy = -Dy; 
+//     }
+//     int TwoDy = 2*Dy; 
+//     int TwoDyTwoDx = TwoDy - 2*Dx; // 2*Dy - 2*Dx
+//     int E = TwoDy - Dx; //2*Dy - Dx
+//     int y = y0;
+//     int xDraw, yDraw;	
+//     for (int x = x0; x != x1; x += xstep) {		
+//         if (steep) {			
+//             xDraw = y;
+//             yDraw = x;
+//         } else {			
+//            xDraw = x;
+//            yDraw = y;
+//         }
+//         // plot
+//         DrawPixel(colour,xDraw, yDraw);
+//         // next
+//         if (E > 0) {
+//             E += TwoDyTwoDx; //E += 2*Dy - 2*Dx;
+//             y = y + ystep;
+//         } else {
+//             E += TwoDy; //E += 2*Dy;
+//         }
+//     }
+// }
 
 
 void  PCF8833::DrawBrLine(int colour, uint8_t x0, uint8_t y0, uint8_t x1, uint8_t y1) { // Bresenham Line Algorithm
@@ -309,17 +308,17 @@ void PCF8833::DrawRectangle(int colour, uint8_t x0, uint8_t y0, uint8_t width, u
     }
 }
 
-void PCF8833::DrawBitmap(int xpos, int ypos) {
-    int count = 0;
-    for (int j = 0; j < sheight; j++) {
-        for (int i = 0; i < swidth; i++) {
-            DrawPixel(pgm_read_word_near(header_data + count),xpos+i,ypos+j);
-            count++;
-        }
-    }
+// void PCF8833::DrawBitmap(int xpos, int ypos) {
+//     int count = 0;
+//     for (int j = 0; j < sheight; j++) {
+//         for (int i = 0; i < swidth; i++) {
+//             DrawPixel(pgm_read_word_near(header_data + count),xpos+i,ypos+j);
+//             count++;
+//         }
+//     }
 
-}
+// }
 
 
-PCF8833 LCDP = PCF8833();
+// PCF8833 LCDP = PCF8833();
 

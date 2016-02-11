@@ -15,7 +15,7 @@ class PCF8833 {
 
 public:
 
-	PCF8833();
+	PCF8833(int8_t CS, int8_t SCLK, int8_t SDIN, int8_t RST);
 
 	void LCDCommand(unsigned char data);
 	void LCDData(unsigned char data);
@@ -36,7 +36,7 @@ public:
 	static const byte SDATA = 5;  
 	*/
 	
-	int8_t cs, sclk, sdin;
+	int8_t cs, sclk, sdin, rst;
 	
 	volatile uint8_t *csport, *sclkport, *sdinport;
     uint8_t cspinmask, sclkpinmask, sdinpinmask;
